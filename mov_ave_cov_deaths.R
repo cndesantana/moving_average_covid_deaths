@@ -68,7 +68,13 @@ for(r in regioes){
   
   
 #### plot porcentagem de casos por região por dia
-p1 <- dat %>% 
+p1 <- 
+  dat %>% 
+  group_by(state) %>%
+  arrange(date) %>%
+  mutate(confirmed = c(0,diff(confirmed))) %>%
+  mutate(confirmed = forecast::ma(confirmed,order=7)) %>% 
+  ungroup() %>%
   group_by(date) %>%
   mutate(totalcasos = sum(confirmed)) %>%
   ungroup() %>%
@@ -88,6 +94,10 @@ dev.off()
 
 #### plot porcentagem de mortes por região por dia
 p1 <- dat %>% 
+  group_by(state) %>%
+  arrange(date) %>%
+  mutate(deaths = c(0,diff(deaths))) %>%
+  mutate(deaths = forecast::ma(deaths,order=7)) %>% ungroup() %>%
   group_by(date) %>%
   mutate(totalmortes = sum(deaths)) %>%
   ungroup() %>%
@@ -99,8 +109,7 @@ p1 <- dat %>%
   labs(title = "Mortes totais confirmadas por dia (% por região)",
        x = "Data",
        y = "Proporção",
-       fill = "Regiões")+
-  scale_color_manual(values = plasma_pal)
+       fill = "Regiões")
 png("mortes_por_regiao.png",width=3200,height=1800,res=300)
 print(p1)
 dev.off()
@@ -108,7 +117,12 @@ dev.off()
 
 #### plot porcentagem de casos por ESTADO por dia
 for(r in regioes){
-  p1 <- dat %>% filter(regiao == r) %>%
+  p1 <- dat %>% 
+    filter(regiao == r) %>%
+    group_by(state) %>%
+    arrange(date) %>%
+    mutate(confirmed = c(0,diff(confirmed))) %>%
+    mutate(confirmed = forecast::ma(confirmed,order=7)) %>% ungroup() %>%
     group_by(date) %>%
     mutate(totalcasos = sum(confirmed)) %>%
     ungroup() %>%
@@ -129,7 +143,12 @@ for(r in regioes){
 
 
 for(r in regioes){
-  p1 <- dat %>% filter(regiao == r) %>%
+  p1 <- dat %>% 
+    filter(regiao == r) %>%
+    group_by(state) %>%
+    arrange(date) %>%
+    mutate(deaths = c(0,diff(deaths))) %>%
+    mutate(deaths = forecast::ma(deaths,order=7)) %>% ungroup()%>%
     group_by(date) %>%
     mutate(totalcasos = sum(confirmed)) %>%
     ungroup() %>%
